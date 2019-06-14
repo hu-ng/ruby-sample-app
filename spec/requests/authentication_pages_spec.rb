@@ -17,7 +17,6 @@ describe "Authentication" do
         before { click_link "Home" }
         it { should_not have_selector('div.alert.alert-error') }
       end
-
     end
 
     describe "with valid information" do
@@ -53,6 +52,22 @@ describe "Authentication" do
 
   describe "authorization" do
 
+    describe "when signed in" do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:new_user) { FactoryGirl.attributes_for(:user) }
+      before { sign_in user, no_capybara: true}
+
+      describe "should not access new user form" do
+        before { get new_user_path }
+        specify { response.should redirect_to(root_url) }
+      end
+
+      describe "should not access form submissions" do
+        before { post users_path user: new_user}
+        specify { response.should redirect_to(root_url) }
+      end
+    end
+
     describe "for non-signed-in users" do
       let(:user) { FactoryGirl.create(:user) }
 
@@ -66,6 +81,18 @@ describe "Authentication" do
 
           it "should render the desired protected page" do
             expect(page).to have_title('Edit user')
+          end
+
+          describe "when signing in again" do
+            before do
+              click_link "Sign out"
+              visit signin_path
+              sign_in user
+            end
+
+            it "should render the default profile page" do
+              expect(page).to have_title(user.name)
+            end
           end
         end
       end
@@ -118,5 +145,14 @@ describe "Authentication" do
       end
     end
 
+    describe "as admin user" do
+      let(:admin) { FactoryGirl.create(:admin) }
+      before { sign_in admin, no_capybara: true }
+
+      describe "cannot delete themselves" do
+        before { delete user_path(admin) }
+        it { expect(response).to redirect_to(users_path) }
+      end
+    end
   end
 end
