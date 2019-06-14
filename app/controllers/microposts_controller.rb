@@ -15,7 +15,7 @@ class MicropostsController < ApplicationController
 
   def destroy
     @micropost.destroy
-    redirect_to root_url
+    redirect_back_or root_url # Redirects to the page that the user deletes the posts from
   end
 
   private
