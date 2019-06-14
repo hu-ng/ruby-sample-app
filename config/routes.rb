@@ -1,6 +1,7 @@
 SampleApp::Application.routes.draw do
   resources :users  # Creates 4 RESTful routes
-  resources :sessions, only: [:new, :create, :destroy]  # Creteas on 3 routes because we don't need update
+  resources :sessions, only: [:new, :create, :destroy]  # Creates only 3 routes because we don't need update
+  resources :microposts, only: [:create, :destroy]
   root 'static_pages#home'
   match '/help',    to: 'static_pages#help',    via: 'get'
   match '/about',   to: 'static_pages#about',   via: 'get'
